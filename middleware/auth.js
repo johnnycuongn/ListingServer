@@ -1,3 +1,10 @@
+const User = require('../models/user')
+/**
+ * Require header: `Authorization`
+ * 
+ * 
+ * @return userObject 
+ */
 const authMiddleware = async (req, res, next) => {
     try {
         const tokenHeader = req.header('Authorization').split(' ')[1]
@@ -18,4 +25,4 @@ const authMiddleware = async (req, res, next) => {
     }
 }
 
-module.export = { authMiddleware: authMiddleware }
+module.exports = { authMiddleware }

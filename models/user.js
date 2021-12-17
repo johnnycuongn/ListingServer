@@ -1,3 +1,5 @@
+const mongoose = require('mongoose')
+
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
@@ -48,14 +50,19 @@ const userSchema = new mongoose.Schema({
 const bcrypt = require('bcrypt')
 
 /** Validate user credentials through email and password  */
-userSchema.statics.findByCredentials = async (email, password) => {
-    const user = await User.findOne({ email })
-    if (!user) throw new Error('Unable to find user')
+userSchema.statics.findByCredentials = async function (email, password) {
+    try {
+        const user = await User.findOne({ email })
+        if (!user) throw new Error('Unable to find user')
 
-    const isMatch = bcrypt.compare(password, user.password)
-    if (!isMatch) throw new Error('Unable to login')
+        const isMatch = bcrypt.compare(password, user.password)
+        if (!isMatch) throw new Error('Unable to login')
 
-    return user
+        return user
+    } catch (error) {
+        throw error
+    }
+
 }
 
 // Hash password before save user
@@ -84,4 +91,5 @@ userSchema.methods.generateAuthToken = async function () {
     return token
 }
 
-module.exports = mongoose.model('User', userSchema)
+const User = mongoose.model('User', userSchema)
+module.exports = User

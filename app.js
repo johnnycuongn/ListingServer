@@ -39,7 +39,7 @@ const { authMiddleware } = require('./middleware/auth')
 
 // USER
 const userRouter = express.Router()
-userRouter.use('/user', userRouter)
+app.use('/user', userRouter)
 
 userRouter.post('/', async (req, res) => {
     console.log('Post user req ' + JSON.stringify(req.body))
@@ -61,15 +61,15 @@ userRouter.post('/login', async (req, res) => {
         const token = await user.generateAuthToken()
         res.send({ user, token })
     } catch (error) {
-        res.status(404).send(error)
+        res.status(404).send('Unable to login')
     }
 
 })
 
 
-
 userRouter.get('/profile', authMiddleware, async (req, res) => {
     try {
+        console.log('Doing profile');
         res.send(req.user)
     } catch (error) {
         res.status(401).send('Please anthenticate')
@@ -161,3 +161,9 @@ taskRouter.patch('/:id', async (req, res) => {
 // User.estimatedDocumentCount().then((value) => {
 //     console.log(`Number of users: ${value}`)
 // })
+
+async function main() {
+    // const user = await User.fi
+}
+
+main()
