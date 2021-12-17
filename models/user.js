@@ -44,8 +44,10 @@ const userSchema = new mongoose.Schema({
 })
 
 
-// Validating credentials
+
 const bcrypt = require('bcrypt')
+
+/** Validate user credentials through email and password  */
 userSchema.statics.findByCredentials = async (email, password) => {
     const user = await User.findOne({ email })
     if (!user) throw new Error('Unable to find user')
@@ -66,10 +68,12 @@ userSchema.pre('save', async function (next) {
     next()
 })
 
+// METHODS
+
 const jwt = require('jsonwebtoken')
 const secretKey = "thisistaskmanager"
-// Generate token for user
-/** Use to generate token */
+
+/** Use to generate token for user */
 userSchema.methods.generateAuthToken = async function () {
     const user = this
     const token = jwt.sign({ _id: user._id.toString() }, secretKey)

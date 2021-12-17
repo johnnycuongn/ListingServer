@@ -35,8 +35,13 @@ app.listen(port, () => {
     console.log(`Listening to port ${port}`);
 })
 
+const { authMiddleware } = require('./middleware/auth')
+
 // USER
-app.post('/user', async (req, res) => {
+const userRouter = express.Router()
+userRouter.use('/user', userRouter)
+
+userRouter.post('/', async (req, res) => {
     console.log('Post user req ' + JSON.stringify(req.body))
     if (!validator.default.isJSON(JSON.stringify(req.body))) return res.send('Wrong type of request body')
 
@@ -50,7 +55,7 @@ app.post('/user', async (req, res) => {
     }
 })
 
-app.post('/user/login', async (req, res) => {
+userRouter.post('/login', async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
         const token = await user.generateAuthToken()
@@ -61,27 +66,9 @@ app.post('/user/login', async (req, res) => {
 
 })
 
-const auth = async (req, res, next) => {
-    try {
-        const tokenHeader = req.header('Authorization').split(' ')[1]
 
-        const decoded = jwt.verify(tokenHeader, secretKey)
 
-        const user = await User.findById(decoded._id)
-
-        if (!user) return res.statusCode(401).send('Cant find user')
-        if (user.tokens.filter(token => token.token === tokenHeader).length === 0) throw new Error()
-
-        req.token = tokenHeader
-        req.user = user
-        next()
-    }
-    catch (error) {
-        res.status(401).send('Please authenticate')
-    }
-}
-
-app.get('/user/profile', auth, async (req, res) => {
+userRouter.get('/profile', authMiddleware, async (req, res) => {
     try {
         res.send(req.user)
     } catch (error) {
@@ -89,7 +76,7 @@ app.get('/user/profile', auth, async (req, res) => {
     }
 })
 
-app.get('/user/:id', auth, (req, res) => {
+userRouter.get('/:id', authMiddleware, (req, res) => {
     console.log('Getting user by id' + JSON.stringify(req.params));
     const _id = req.params.id
     User.findById(_id).then((user) => {
@@ -101,7 +88,8 @@ app.get('/user/:id', auth, (req, res) => {
     })
 })
 
-app.post('/user/logout', auth, async (req, res) => {
+
+userRouter.post('/logout', authMiddleware, async (req, res) => {
     try {
         const id = req.user._id
         const user = await User.findById(id)
