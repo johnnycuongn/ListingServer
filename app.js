@@ -114,10 +114,13 @@ taskRouter.get('/', (req, res) => {
 })
 
 
-taskRouter.post('/', async (req, res) => {
+taskRouter.post('/', authMiddleware, async (req, res) => {
     console.log('POST params: ' + JSON.stringify(req.params) + ` at path ${req.url}`)
     try {
-        await Task.create(req.body)
+        await Task.create({
+            ...req.body,
+            owner: req.user._id
+        })
         res.send('Sucessfully add new task')
     } catch (error) {
         res.status(404).send('Unable to send data - Error: ' + error)
@@ -164,6 +167,9 @@ taskRouter.patch('/:id', async (req, res) => {
 
 async function main() {
     // const user = await User.fi
+    const user = await User.findById('61bc8bca86923a11b9ffc90e')
+    await user.populate(['tasks'])
+    console.log(user.tasks)
 }
 
 main()

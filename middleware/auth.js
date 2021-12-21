@@ -1,4 +1,7 @@
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
+const secretKey = "thisistaskmanager"
+
 /**
  * Require header: `Authorization`
  * 
@@ -21,7 +24,7 @@ const authMiddleware = async (req, res, next) => {
         next()
     }
     catch (error) {
-        res.status(401).send('Please authenticate')
+        res.status(401).send('Please authenticate ' + error)
     }
 }
 

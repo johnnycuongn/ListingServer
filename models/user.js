@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const validator = require('validator')
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -45,6 +46,14 @@ const userSchema = new mongoose.Schema({
     }]
 })
 
+// When you `populate()` the `task` virtual, Mongoose will find the
+// first document in the Task model whose 'foreignField - owner (defined in task schema)' 
+// matches this document's `localField - _id` property.
+userSchema.virtual('tasks', {
+    ref: 'Task',
+    localField: '_id',
+    foreignField: 'owner'
+})
 
 
 const bcrypt = require('bcrypt')
