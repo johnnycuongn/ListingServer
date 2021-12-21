@@ -105,12 +105,17 @@ userRouter.post('/logout', authMiddleware, async (req, res) => {
 const taskRouter = express.Router()
 app.use('/tasks', taskRouter)
 // Users
-taskRouter.get('/', (req, res) => {
-    console.log('Get params: ' + JSON.stringify(req.params) + ` at path ${req.url}`)
-    Task.find({}, (err, tasks) => {
-        if (err) return res.status(404).send('Error getting tasks')
-        res.json(tasks)
-    })
+taskRouter.get('/', authMiddleware, async (req, res) => {
+    // console.log('Get params: ' + JSON.stringify(req.params) + ` at path ${req.url}`)
+    // Task.find({}, (err, tasks) => {
+    //     if (err) return res.status(404).send('Error getting tasks')
+    //     res.json(tasks)
+    // })
+    const user = req.user
+
+    // Populating virtual tasks for a user
+    await user.populate(['tasks'])
+    res.json(user.tasks)
 })
 
 
@@ -127,31 +132,34 @@ taskRouter.post('/', authMiddleware, async (req, res) => {
     }
 })
 
-taskRouter.delete('/', async (req, res) => {
+taskRouter.delete('/', authMiddleware, async (req, res) => {
     try {
-        const deletedTask = await Task.findOneAndDelete({ _id: req.body._id })
+        const userId = req.user._id
+        const deletedTask = await Task.findOneAndDelete({ _id: req.body._id, owner: userId })
         res.status(201).send(`Sucessfully delete task title ${deletedTask.title}`)
     } catch (error) {
         res.status(404).send('Unable to delete ' + req.body._id)
     }
 })
 
-taskRouter.get('/:id', async (req, res) => {
+taskRouter.get('/:id', authMiddleware, async (req, res) => {
     try {
-        const task = await Task.findById(req.params.id)
+        const userId = req.user._id
+        const task = await Task.findOne({ _id: req.params.id, owner: userId })
+        if (!task) return res.status(404).send('Unable to get task')
         res.json(task)
     } catch (error) {
         res.status(404).send('Unable to get ' + req.params.id)
     }
 })
 
-taskRouter.patch('/:id', async (req, res) => {
+taskRouter.patch('/:id', authMiddleware, async (req, res) => {
     try {
         if (!req.body) return res.status(404).send('Empty Body')
 
-        // const updates = Object.keys(req.body)
-        // const allowedUpdates = ['username', 'email', 'password', 'age']
-        // const isValidOperation = updates.every(update => allowedUpdates.includes(update))
+        const updates = Object.keys(req.body)
+        const allowedUpdates = ['title', 'content', 'completed']
+        const isValidOperation = updates.every(update => allowedUpdates.includes(update))
 
         if (!isValidOperation) return res.status(404).send('Invlalid operation')
 
@@ -165,11 +173,6 @@ taskRouter.patch('/:id', async (req, res) => {
 //     console.log(`Number of users: ${value}`)
 // })
 
-async function main() {
-    // const user = await User.fi
-    const user = await User.findById('61bc8bca86923a11b9ffc90e')
-    await user.populate(['tasks'])
-    console.log(user.tasks)
-}
 
-main()
+
+
