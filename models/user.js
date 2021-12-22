@@ -84,6 +84,14 @@ userSchema.pre('save', async function (next) {
     next()
 })
 
+const Task = require('./task')
+// Removing all user's tasks
+userSchema.pre('remove', async function (next) {
+    const user = this
+    await Task.deleteMany({ owner: user._id })
+    next()
+})
+
 // METHODS
 
 const jwt = require('jsonwebtoken')
