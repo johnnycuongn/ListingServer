@@ -1,10 +1,8 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
 
-const connectionURL = 'mongodb://127.0.0.1:27017'
-const database = 'task-manager'
 
-mongoose.connect(`${connectionURL}/${database}`)
+mongoose.connect(`${process.env.MONGODB_URL}/${process.env.MONGODB_TASKDB}`)
 
 const Task = require('./models/task')
 const User = require('./models/user')
@@ -29,7 +27,7 @@ app.use((req, res, next) => {
     next()
 })
 
-const port = process.env.PORT || 3000
+const port = process.env.PORT
 
 app.listen(port, () => {
     console.log(`Listening to port ${port}`);

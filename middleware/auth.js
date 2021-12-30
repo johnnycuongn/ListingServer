@@ -1,6 +1,5 @@
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
-const secretKey = "thisistaskmanager"
 
 /**
  * Require header: `Authorization`
@@ -12,7 +11,7 @@ const authMiddleware = async (req, res, next) => {
     try {
         const tokenHeader = req.header('Authorization').split(' ')[1]
 
-        const decoded = jwt.verify(tokenHeader, secretKey)
+        const decoded = jwt.verify(tokenHeader, process.env.JWT_SECRET)
 
         const user = await User.findById(decoded._id)
 

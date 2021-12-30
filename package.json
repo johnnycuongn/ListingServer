@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest --watch",
     "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "env-cmd -f ./config/dev.env nodemon app.js"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +20,7 @@
     "validator": "^13.7.0"
   },
   "devDependencies": {
+    "env-cmd": "^10.1.0",
     "jest": "^27.4.5",
     "nodemon": "^2.0.15"
   }
