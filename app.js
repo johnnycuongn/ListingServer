@@ -27,11 +27,6 @@ app.use((req, res, next) => {
     next()
 })
 
-const port = process.env.PORT
-
-app.listen(port, () => {
-    console.log(`Listening to port ${port}`);
-})
 
 const { authMiddleware } = require('./middleware/auth')
 const routes = require('./routes')
@@ -44,6 +39,7 @@ app.use('/tasks', routes.Task)
 //     console.log(`Number of users: ${value}`)
 // })
 
+module.exports = app
 
 
 

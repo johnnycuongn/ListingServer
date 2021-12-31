@@ -13,6 +13,7 @@ userRouter.post('/', async (req, res) => {
 
     try {
         const user = new User(req.body)
+        await user.save()
         const token = await user.generateAuthToken()
         res.send({ user, token })
     }

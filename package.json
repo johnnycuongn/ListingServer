@@ -4,9 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --watch",
-    "start": "node app.js",
-    "dev": "env-cmd -f ./config/dev.env nodemon app.js"
+    "test": "env-cmd -f ./config/test.env jest --watch --detectOpenHandles",
+    "start": "node index.js",
+    "dev": "env-cmd -f ./config/dev.env nodemon index.js"
+  },
+  "jest": {
+    "testEnvironment": "node"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +20,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.2.1",
     "mongoose": "^6.1.1",
+    "supertest": "^6.1.6",
     "validator": "^13.7.0"
   },
   "devDependencies": {
