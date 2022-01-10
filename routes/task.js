@@ -29,7 +29,7 @@ taskRouter.post('/', authMiddleware, async (req, res) => {
             ...req.body,
             owner: req.user._id
         })
-        res.send('Sucessfully add new task')
+        res.status(201).send('Sucessfully add new task')
     } catch (error) {
         res.status(404).send('Unable to send data - Error: ' + error)
     }
