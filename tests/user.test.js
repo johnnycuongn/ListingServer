@@ -16,7 +16,9 @@ const testUserOne = {
     ]
 }
 
-
+beforeAll(async () => {
+    await User.deleteMany()
+})
 
 beforeEach(async () => {
     await User.deleteMany()
