@@ -18,10 +18,19 @@ const testUserOne = {
     ]
 }
 
+const testTaskId = new mongoose.Types.ObjectId()
+const testTask = {
+    _id: testTaskId,
+    title: 'test title',
+    content: 'test content',
+    owner: testUserOneId
+}
+
 
 beforeEach(async () => {
     await User.deleteMany()
     await new User(testUserOne).save()
+    await Task.deleteMany()
 })
 
 test('should not task created unauthorized', async () => {
@@ -45,4 +54,32 @@ test('should task created', async () => {
     expect(taskCreated).toBeTruthy()
     expect(taskCreated.title).toBe('test title')
     expect(taskCreated.content).toBe('test content')
+})
+
+test('should get a task', async () => {
+    await new Task(testTask).save()
+
+    const response = await request(app).get(`/tasks/${testTaskId}`)
+        .set('Authorization', `Bearer ${testUserOne.tokens[0].token}`)
+        .send()
+        .expect(200)
+
+    expect(response.body).toMatchObject(testTask)
+})
+
+test('should update a task', async () => {
+    await new Task(testTask).save()
+
+    await request(app).patch(`/tasks/${testTaskId}`)
+        .set('Authorization', `Bearer ${testUserOne.tokens[0].token}`)
+        .send({
+            title: 'test new title',
+            completed: true
+        })
+        .expect(200)
+
+    const task = await Task.findById(testTaskId)
+    expect(task.title).toBe('test new title')
+    expect(task.completed).toBe(true)
+    expect(task.content).toBe(testTask.content)
 })
